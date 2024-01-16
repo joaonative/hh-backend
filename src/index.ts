@@ -1,5 +1,7 @@
 import express from "express";
 
+import { seedData } from "./insertData_test";
+
 import { DataSource } from "typeorm";
 import { User } from "./entities/User";
 import { Habit } from "./entities/Habit";
@@ -34,3 +36,9 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor está ouvindo na porta ${port}`);
 });
+
+try {
+  seedData();
+} catch (err) {
+  console.error(err);
+}
