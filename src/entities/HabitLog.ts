@@ -11,7 +11,7 @@ export class HabitLog {
   timestamp?: Date;
 
   @Column()
-  notes?: string;
+  monthlyOccurrences?: number;
 
   @ManyToOne(() => User, (user) => user.habitLogs)
   user?: User;
