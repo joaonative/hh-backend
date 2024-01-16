@@ -25,6 +25,9 @@ export class Habit {
   @Column({ default: 0 })
   monthlyOccurrences?: number;
 
+  @Column({ default: 0 })
+  totalOccurrences?: number;
+
   @ManyToOne(() => User, (user) => user.habits)
   user?: User;
 
