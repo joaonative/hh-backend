@@ -1,4 +1,5 @@
 import express from "express";
+import bodyParser from "body-parser";
 
 import { seedData } from "./insertData_test";
 
@@ -7,7 +8,13 @@ import { User } from "./entities/User";
 import { Habit } from "./entities/Habit";
 import { HabitLog } from "./entities/HabitLog";
 
+import router from "./routes/routes";
+
 const app = express();
+
+app.use(bodyParser.json());
+app.use("/api", router);
+
 const port = 3000;
 
 export const AppDataSource = new DataSource({
@@ -37,8 +44,8 @@ app.listen(port, () => {
   console.log(`Servidor está ouvindo na porta ${port}`);
 });
 
-try {
-  seedData();
-} catch (err) {
-  console.error(err);
-}
+// try {
+//   seedData();
+// } catch (err) {
+//   console.error(err);
+// }
