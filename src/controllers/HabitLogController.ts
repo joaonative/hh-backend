@@ -32,3 +32,5 @@ class HabitLogController {
     }
   }
 }
+
+export default new HabitLogController();

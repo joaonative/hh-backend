@@ -32,3 +32,5 @@ class HabitController {
     }
   }
 }
+
+export default new HabitController();
