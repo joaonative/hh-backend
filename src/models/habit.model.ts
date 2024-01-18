@@ -1,6 +1,7 @@
 import { Schema, Document, model } from "mongoose";
 
 export interface HabitDocument extends Document {
+  author: string;
   name: string;
   description: string;
   frequency: number;
@@ -9,6 +10,7 @@ export interface HabitDocument extends Document {
 }
 
 const habitSchema = new Schema<HabitDocument>({
+  author: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   frequency: { type: Number, required: true },
