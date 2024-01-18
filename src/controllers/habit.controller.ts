@@ -27,6 +27,22 @@ class HabitController {
       res.status(500).send("Internal server error");
     }
   }
+
+  async getHabitsByUser(req: Request, res: Response) {
+    try {
+      const { author } = req.body;
+      const userHabits = await HabitModel.find({ author });
+
+      if (!userHabits) {
+        return res.status(400).send("User dont have any habits created");
+      }
+
+      return res.status(201).json(userHabits);
+    } catch (error) {
+      console.error("Error while getting user habits", error);
+      res.status(500).send("Internal server error");
+    }
+  }
 }
 
 export default new HabitController();
