@@ -1,8 +1,8 @@
 import express from "express";
 
-import UserController from "../controllers/UserController";
-import HabitController from "../controllers/HabitController";
-import HabitLogController from "../controllers/HabitLogController";
+import UserController from "../controllers/user.controller";
+import HabitController from "../controllers/habit.controller";
+import HabitLogController from "../controllers/habit-log.controller";
 
 const router = express.Router();
 
