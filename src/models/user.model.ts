@@ -11,14 +11,14 @@ interface Habit {
 interface UserDocument extends Document {
   name: string;
   email: string;
-  googleId?: string;
+  image: string;
   habits?: Habit[];
 }
 
 const userSchema = new Schema<UserDocument>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  googleId: { type: String, unique: true, sparse: true },
+  image: { type: String, required: true },
   habits: [
     {
       name: { type: String, required: true },
