@@ -4,9 +4,9 @@ import HabitModel, { HabitDocument } from "../models/habit.model";
 class HabitController {
   async createHabit(req: Request, res: Response) {
     try {
-      const { name, description, frequency, user } = req.body;
+      const { name, description, frequency, author } = req.body;
 
-      const existingHabit = await HabitModel.findOne({ name, user });
+      const existingHabit = await HabitModel.findOne({ name, author });
 
       if (existingHabit) {
         return res
@@ -18,7 +18,7 @@ class HabitController {
         name,
         description,
         frequency,
-        user,
+        author,
       });
 
       res.status(201).json(newHabit);
