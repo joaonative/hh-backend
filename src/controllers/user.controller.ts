@@ -9,7 +9,11 @@ dotenv.config();
 class UserController {
   async createUser(req: Request, res: Response) {
     try {
-      const { name, email, image } = req.body;
+      const { name, email } = req.body;
+
+      if (!name || !email) {
+        return res.status(400).send(`Faltando data ${name} ${email}`);
+      }
 
       const existingUser = await UserModel.findOne({ email });
 
@@ -24,7 +28,6 @@ class UserController {
       const newUser = await UserModel.create({
         name,
         email,
-        image,
       });
 
       const token = jwt.sign(
