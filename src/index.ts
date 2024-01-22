@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import { mongooseConnection } from "./mongoose";
 
@@ -10,6 +11,7 @@ dotenv.config();
 
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 app.use("/api", router);
 
