@@ -1,4 +1,5 @@
-import { Schema, Document, model } from "mongoose";
+import { Schema, Document, model, Types } from "mongoose";
+import UserModel from "./user.model";
 
 export interface HabitDocument extends Document {
   author: string;
@@ -17,6 +18,11 @@ const habitSchema = new Schema<HabitDocument>({
   monthlyOccurrences: { type: Number, default: 0 },
   totalOccurrences: { type: Number, default: 0 },
 });
+
+habitSchema.path("author").validate(async function (value: string) {
+  const user = await UserModel.findOne({ email: value });
+  return !!user;
+}, "Author must be a valid user email.");
 
 const HabitModel = model<HabitDocument>("Habit", habitSchema);
 

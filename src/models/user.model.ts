@@ -1,31 +1,16 @@
 import { Schema, Document, model } from "mongoose";
-
-interface Habit {
-  name: string;
-  description: string;
-  frequency: number;
-  monthlyOccurrences: number;
-  totalOccurrences: number;
-}
+import HabitModel, { HabitDocument } from "./habit.model";
 
 interface UserDocument extends Document {
   name: string;
   email: string;
-  habits?: Habit[];
+  habits?: HabitDocument[];
 }
 
 const userSchema = new Schema<UserDocument>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  habits: [
-    {
-      name: { type: String, required: true },
-      description: { type: String, required: true },
-      frequency: { type: Number, required: true },
-      monthlyOccurrences: { type: Number, default: 0 },
-      totalOccurrences: { type: Number, default: 0 },
-    },
-  ],
+  habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],
 });
 
 const UserModel = model<UserDocument>("User", userSchema);
