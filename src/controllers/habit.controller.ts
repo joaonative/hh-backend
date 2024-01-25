@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import HabitModel, { HabitDocument } from "../models/habit.model";
+import UserModel from "../models/user.model";
 
 class HabitController {
   async createHabit(req: Request, res: Response) {
@@ -14,12 +15,28 @@ class HabitController {
           .send("User already has a habit that contains this name");
       }
 
+      const user = await UserModel.findOne({ email: author });
+
+      if (!user) {
+        return res.status(400).send("User not found");
+      }
+
+      // Criar um novo hábito associado ao usuário
       const newHabit: HabitDocument = await HabitModel.create({
-        name,
-        description,
-        frequency,
-        author,
+        author: user.email,
+        name: name,
+        description: description,
+        frequency: frequency,
       });
+
+      if (user.habits) {
+        user.habits.push(newHabit._id);
+
+        await user.save();
+      }
+
+      // Salvar as alterações no usuário
+      await user.save();
 
       res.status(201).json(newHabit);
     } catch (error) {
@@ -30,11 +47,15 @@ class HabitController {
 
   async getHabitsByUser(req: Request, res: Response) {
     try {
-      const { author } = req.body;
+      const author = req.header("author");
       const userHabits = await HabitModel.find({ author });
 
-      if (!userHabits) {
-        return res.status(400).send("User dont have any habits created");
+      if (!author) {
+        return res.status(400).send("Author missing");
+      }
+
+      if (!userHabits || userHabits.length === 0) {
+        return res.status(200).json([]);
       }
 
       return res.status(201).json(userHabits);

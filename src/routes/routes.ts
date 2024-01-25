@@ -11,6 +11,8 @@ router.post("/users", UserController.createUser); //create user
 
 router.post("/habits", verifyToken, HabitController.createHabit); //create habit
 
+router.get("/habits", verifyToken, HabitController.getHabitsByUser); //get user habits
+
 router.get(
   "/habit-log/:userId/:habitId/stats",
   HabitLogController.getHabitLogs
