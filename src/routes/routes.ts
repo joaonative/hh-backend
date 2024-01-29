@@ -13,6 +13,8 @@ router.post("/habits", verifyToken, HabitController.createHabit); //create habit
 
 router.get("/habits", verifyToken, HabitController.getHabitsByUser); //get user habits
 
+router.put("/habits/:id", verifyToken, HabitController.markHabitDoneToday); //mark habit done
+
 router.get(
   "/habit-log/:userId/:habitId/stats",
   HabitLogController.getHabitLogs
