@@ -1,4 +1,4 @@
-import { Schema, Document, model } from "mongoose";
+import { Schema, Document, model, Query } from "mongoose";
 import HabitModel, { HabitDocument } from "./habit.model";
 
 interface UserDocument extends Document {
@@ -10,7 +10,7 @@ interface UserDocument extends Document {
 const userSchema = new Schema<UserDocument>({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],
+  habits: [{ type: Schema.Types.ObjectId, ref: "Habit", cascade: true }],
 });
 
 const UserModel = model<UserDocument>("User", userSchema);
