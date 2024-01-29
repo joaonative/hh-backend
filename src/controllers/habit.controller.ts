@@ -5,7 +5,7 @@ import UserModel from "../models/user.model";
 class HabitController {
   async createHabit(req: Request, res: Response) {
     try {
-      const { name, description, frequency, author } = req.body;
+      const { name, description, goal, author, isGood } = req.body;
 
       const existingHabit = await HabitModel.findOne({ name, author });
 
@@ -26,7 +26,8 @@ class HabitController {
         author: user.email,
         name: name,
         description: description,
-        frequency: frequency,
+        goal: goal,
+        isGood: isGood,
       });
 
       if (user.habits) {
@@ -41,6 +42,43 @@ class HabitController {
       res.status(201).json(newHabit);
     } catch (error) {
       console.error("Error while creating a habit", error);
+      res.status(500).send("Internal server error");
+    }
+  }
+
+  async markHabitDoneToday(req: Request, res: Response) {
+    try {
+      const habitId = req.params.id;
+
+      // Encontrar o hábito pelo ID
+      const habit = await HabitModel.findById(habitId);
+
+      if (!habit) {
+        return res.status(404).send("Habit not found");
+      }
+
+      // Verificar se o hábito já foi feito hoje
+      if (habit.lastPerformed) {
+        const today = new Date();
+        const habitDate = new Date(habit.lastPerformed);
+
+        if (
+          today.getFullYear() === habitDate.getFullYear() &&
+          today.getMonth() === habitDate.getMonth() &&
+          today.getDate() === habitDate.getDate()
+        ) {
+          return res.status(400).send("Habit already done today");
+        }
+      }
+
+      // Marcar o hábito como feito hoje e incrementar as monthlyOccurrences
+      habit.lastPerformed = new Date();
+      habit.monthlyOccurrences += 1;
+      await habit.save();
+
+      res.status(200).send;
+    } catch (error) {
+      console.error("Error while marking habit as done today", error);
       res.status(500).send("Internal server error");
     }
   }
