@@ -46,6 +46,40 @@ class HabitController {
     }
   }
 
+  async deleteHabit(req: Request, res: Response) {
+    try {
+      const habitId = req.params.id;
+
+      if (!habitId) {
+        return res.status(404).send("Habit id is required");
+      }
+
+      const habit = await HabitModel.findById(habitId);
+      const userEmail = habit?.author;
+
+      const deletedHabit = await HabitModel.findByIdAndDelete(habitId);
+
+      if (!deletedHabit) {
+        return res.status(404).send("Habit not found");
+      }
+
+      if (userEmail) {
+        const user = await UserModel.findOne({ userEmail });
+
+        if (user) {
+          user.habits =
+            user.habits?.filter((habit) => habit.toString() !== habitId) || [];
+          await user.save();
+        }
+      }
+
+      res.status(200).send();
+    } catch (error) {
+      console.error("Error while deleting habit", error);
+      res.status(500).send("Internal server error");
+    }
+  }
+
   async markHabitDoneToday(req: Request, res: Response) {
     try {
       const habitId = req.params.id;
@@ -71,12 +105,28 @@ class HabitController {
         }
       }
 
-      // Marcar o hábito como feito hoje e incrementar as monthlyOccurrences
+      // Verificar se a última execução foi no mesmo mês
+      const lastPerformedMonth = habit.lastPerformed
+        ? habit.lastPerformed.getMonth()
+        : null;
+      const currentMonth = new Date().getMonth();
+
+      // Se não houve execução neste mês, reiniciar as monthlyOccurrences
+      if (lastPerformedMonth !== currentMonth) {
+        habit.monthlyOccurrences = 1;
+      } else {
+        // Se houve execução neste mês, incrementar as monthlyOccurrences
+        habit.monthlyOccurrences += 1;
+      }
+
+      habit.frequency += 1;
+
+      // Marcar o hábito como feito hoje e atualizar lastPerformed
       habit.lastPerformed = new Date();
-      habit.monthlyOccurrences += 1;
+
       await habit.save();
 
-      res.status(200).send;
+      res.status(200).send();
     } catch (error) {
       console.error("Error while marking habit as done today", error);
       res.status(500).send("Internal server error");
