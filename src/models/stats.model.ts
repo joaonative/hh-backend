@@ -18,6 +18,6 @@ const statsSchema = new Schema<StatsDocument>({
   totalBadOccurrences: { type: Number, default: 0 },
 });
 
-const MonthlyStatsModel = model<StatsDocument>("MonthlyStats", statsSchema);
+const statsModel = model<StatsDocument>("MonthlyStats", statsSchema);
 
-export default MonthlyStatsModel;
+export default statsModel;

@@ -8,7 +8,6 @@ export interface HabitDocument extends Document {
   frequency: number;
   goal: number;
   monthlyOccurrences: number;
-  totalOccurrences: number;
   lastPerformed: Date | null;
   isGood: boolean;
 }
@@ -17,10 +16,9 @@ const habitSchema = new Schema<HabitDocument>({
   author: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
-  frequency: { type: Number },
+  frequency: { type: Number, default: 0 },
   goal: { type: Number, required: true },
   monthlyOccurrences: { type: Number, default: 0 },
-  totalOccurrences: { type: Number, default: 0 },
   lastPerformed: { type: Date, default: null },
   isGood: { type: Boolean, default: true },
 });
