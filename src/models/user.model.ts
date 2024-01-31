@@ -7,11 +7,14 @@ interface UserDocument extends Document {
   habits?: HabitDocument[];
 }
 
-const userSchema = new Schema<UserDocument>({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  habits: [{ type: Schema.Types.ObjectId, ref: "Habit", cascade: true }],
-});
+const userSchema = new Schema<UserDocument>(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    habits: [{ type: Schema.Types.ObjectId, ref: "Habit" }],
+  },
+  { timestamps: true }
+);
 
 const UserModel = model<UserDocument>("User", userSchema);
 

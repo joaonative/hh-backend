@@ -64,7 +64,7 @@ class HabitController {
       }
 
       if (userEmail) {
-        const user = await UserModel.findOne({ userEmail });
+        const user = await UserModel.findOne({ email: userEmail });
 
         if (user) {
           user.habits =
