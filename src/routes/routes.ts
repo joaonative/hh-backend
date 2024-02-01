@@ -5,12 +5,15 @@ import UserController from "../controllers/user.controller";
 import HabitController from "../controllers/habit.controller";
 import userController from "../controllers/user.controller";
 import habitController from "../controllers/habit.controller";
+import streakController from "../controllers/streak.controller";
 
 const router = express.Router();
 
 router.post("/users", UserController.createUser); //create user
 
 router.get("/users/:email", verifyToken, userController.getMonthlyStats); //get stats
+
+router.get("/streak", verifyToken, streakController.getUserStreak); //get streak
 
 router.post("/habits", verifyToken, HabitController.createHabit); //create habit
 
