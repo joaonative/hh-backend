@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import HabitModel, { HabitDocument } from "../models/habit.model";
 import UserModel from "../models/user.model";
+import streakController from "./streak.controller";
 
 class HabitController {
   async createHabit(req: Request, res: Response) {
@@ -83,15 +84,12 @@ class HabitController {
   async markHabitDoneToday(req: Request, res: Response) {
     try {
       const habitId = req.params.id;
-
-      // Encontrar o hábito pelo ID
       const habit = await HabitModel.findById(habitId);
 
       if (!habit) {
         return res.status(404).send("Habit not found");
       }
 
-      // Verificar se o hábito já foi feito hoje
       if (habit.lastPerformed) {
         const today = new Date();
         const habitDate = new Date(habit.lastPerformed);
@@ -105,27 +103,23 @@ class HabitController {
         }
       }
 
-      // Verificar se a última execução foi no mesmo mês
       const lastPerformedMonth = habit.lastPerformed
         ? habit.lastPerformed.getMonth()
         : null;
       const currentMonth = new Date().getMonth();
 
-      // Se não houve execução neste mês, reiniciar as monthlyOccurrences
       if (lastPerformedMonth !== currentMonth) {
         habit.monthlyOccurrences = 1;
       } else {
-        // Se houve execução neste mês, incrementar as monthlyOccurrences
         habit.monthlyOccurrences += 1;
       }
 
       habit.frequency += 1;
-
-      // Marcar o hábito como feito hoje e atualizar lastPerformed
       habit.lastPerformed = new Date();
 
       await habit.save();
 
+      await streakController.updateStreak(habit.author, true);
       res.status(200).send();
     } catch (error) {
       console.error("Error while marking habit as done today", error);
