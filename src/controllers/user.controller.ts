@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 import UserModel from "../models/user.model";
 import MonthlyStatsModel from "../models/stats.model";
 import statsModel from "../models/stats.model";
+import HabitModel from "../models/habit.model";
+import StreakModel from "../models/streak.model";
+import streakController from "./streak.controller";
 
 dotenv.config();
 
@@ -31,6 +34,8 @@ class UserController {
         name,
         email,
       });
+
+      await addDefaultHabit(newUser.email);
 
       const token = jwt.sign(
         { email: newUser.email },
@@ -77,16 +82,22 @@ class UserController {
         return res.status(404).send("User not found");
       }
 
-      if (!user.habits || user.habits.length === 0) {
-        return res.status(404).send("User doesn't have any habits");
-      }
-
-      // Verificar se já existe estatística para o mês atual
       let existingStats = await statsModel.findOne({
         userId: user._id,
-        month: currentMonth,
-        year: currentYear,
       });
+
+      if (!user.habits || user.habits.length === 0) {
+        // Se o usuário não tiver hábitos, retornar as estatísticas existentes, se houver
+        if (existingStats) {
+          return res.status(200).json({
+            totalMonthlyOccurrences: existingStats.totalOccurrences,
+            totalGoodOccurrences: existingStats.totalGoodOccurrences,
+            totalBadOccurrences: existingStats.totalBadOccurrences,
+          });
+        } else {
+          return res.status(404).send("User doesn't have any habits");
+        }
+      }
 
       if (existingStats) {
         // Atualizar as estatísticas existentes no banco de dados
@@ -180,3 +191,47 @@ class UserController {
 }
 
 export default new UserController();
+
+async function addDefaultHabit(userEmail: string) {
+  const signUpHabit = await HabitModel.create({
+    author: userEmail,
+    name: "Sign up in Harmony Hub",
+    description:
+      "Congratulations. This essential habit encourages you to take a proactive step towards mental wellness by registering on Harmony Hub.",
+    frequency: 0,
+    goal: 999,
+    lastPerformed: new Date(),
+    isGood: true,
+  });
+
+  const dontBeSadHabit = await HabitModel.create({
+    author: userEmail,
+    name: "Don't suicide",
+    description:
+      "When you're sad, you're not sad. You are merely oblivious to the good things in your life. There is always a crack of light in the darkness. Find it.",
+    frequency: 0,
+    goal: 999,
+    lastPerformed: new Date(),
+    isGood: false,
+  });
+
+  await UserModel.findOneAndUpdate(
+    { email: userEmail },
+    { $addToSet: { habits: [signUpHabit._id, dontBeSadHabit._id] } },
+    { new: true }
+  );
+  const today = new Date();
+  signUpHabit.frequency += 1;
+  signUpHabit.lastPerformed = today;
+
+  dontBeSadHabit.frequency += 1;
+  dontBeSadHabit.lastPerformed = today;
+
+  signUpHabit.monthlyOccurrences = 1;
+  dontBeSadHabit.monthlyOccurrences = 1;
+
+  await signUpHabit.save();
+  await dontBeSadHabit.save();
+
+  await streakController.updateStreak(signUpHabit.author, true);
+}
