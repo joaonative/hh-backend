@@ -17,7 +17,6 @@ class StreakController {
           lastUpdate.getUTCMonth() === today.getUTCMonth() &&
           lastUpdate.getUTCDate() === today.getUTCDate()
         ) {
-          console.log("Hábito já marcado como concluído hoje.");
           return;
         }
 
@@ -31,7 +30,6 @@ class StreakController {
         }
 
         userStreak.lastUpdate = today;
-        console.log(userStreak);
         await userStreak.save();
       } else {
         const initialWeeklyDays = Array(7).fill(false);
