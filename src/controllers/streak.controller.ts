@@ -1,6 +1,5 @@
 import StreakModel from "../models/streak.model";
 import { Request, Response } from "express";
-import UserModel from "../models/user.model";
 
 class StreakController {
   async updateStreak(author: string, habitCompleted: boolean) {
@@ -11,19 +10,23 @@ class StreakController {
       const userStreak = await StreakModel.findOne({ author });
 
       if (userStreak) {
-        const lastUpdate = new Date(userStreak.lastUpdate);
-        if (
-          lastUpdate.getUTCFullYear() === today.getUTCFullYear() &&
-          lastUpdate.getUTCMonth() === today.getUTCMonth() &&
-          lastUpdate.getUTCDate() === today.getUTCDate()
-        ) {
-          return;
+        if (today.getUTCDay() === 0) {
+          userStreak.weeklyDays = Array(7).fill(false);
         }
 
+        const lastUpdate = new Date(userStreak.lastUpdate);
+
+        const oneDay = 24 * 60 * 60 * 1000;
+        const isConsecutiveDay =
+          today.getTime() - lastUpdate.getTime() === oneDay;
+
+        if (!isConsecutiveDay) {
+          userStreak.streakCount = 0;
+        }
         if (habitCompleted) {
           userStreak.streakCount += 1;
 
-          const dayOfWeek = today.getUTCDay(); // 0 para Domingo, 1 para Segunda, ..., 6 para Sábado
+          const dayOfWeek = today.getUTCDay();
           userStreak.weeklyDays[dayOfWeek] = true;
         } else {
           userStreak.streakCount = 0;
