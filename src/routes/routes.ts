@@ -7,6 +7,7 @@ import userController from "../controllers/user.controller";
 import habitController from "../controllers/habit.controller";
 import streakController from "../controllers/streak.controller";
 import statsController from "../controllers/stats.controller";
+import reportController from "../controllers/report.controller";
 
 const router = express.Router();
 
@@ -25,5 +26,9 @@ router.get("/habits", verifyToken, HabitController.getHabitsByUser); //get user 
 router.delete("/habits/:id", verifyToken, habitController.deleteHabit); //delete user habit
 
 router.put("/habits/:id", verifyToken, HabitController.markHabitDoneToday); //mark habit done
+
+router.post("/motivational", verifyToken, reportController.createReport);
+
+router.get("/motivational", verifyToken, reportController.getReports);
 
 export default router;

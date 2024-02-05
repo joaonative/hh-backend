@@ -4,7 +4,11 @@ import ReportModel from "../models/report.model";
 class ReportController {
   async createReport(req: Request, res: Response) {
     try {
-      const { author, report } = req.body;
+      const { author, report, imageUrl, name } = req.body;
+
+      if (!author || !report || !imageUrl) {
+        return res.status(400).send("Fields missing");
+      }
 
       const existingReport = await ReportModel.findOne({ author, report });
 
@@ -15,6 +19,8 @@ class ReportController {
       const newReport = await ReportModel.create({
         author,
         report,
+        imageUrl,
+        name,
       });
       res.status(201).json(newReport);
     } catch (error) {
@@ -26,6 +32,10 @@ class ReportController {
     try {
       const { author } = req.body;
 
+      if (!author) {
+        return res.status(400).send("Author missing");
+      }
+
       const userReports = await ReportModel.find(author);
 
       if (!userReports) {
@@ -35,6 +45,20 @@ class ReportController {
       return res.status(201).json(userReports);
     } catch (error) {
       console.error("Error while getting user reports", error);
+      res.status(500).send("Internal server error");
+    }
+  }
+  async getReports(req: Request, res: Response) {
+    try {
+      const reports = await ReportModel.find({});
+
+      if (!reports || reports.length === 0) {
+        return res.status(404).json({ message: "No reports found" });
+      }
+
+      res.status(200).json(reports);
+    } catch (error) {
+      console.error("Error while getting reports", error);
       res.status(500).send("Internal server error");
     }
   }
